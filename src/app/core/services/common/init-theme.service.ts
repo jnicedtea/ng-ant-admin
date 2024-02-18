@@ -18,7 +18,7 @@ interface InitThemeOption {
 }
 
 /*
- * 初始化theme
+ * Initialize theme
  * */
 @Injectable({
   providedIn: 'root'
