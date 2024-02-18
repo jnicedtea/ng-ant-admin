@@ -15,9 +15,6 @@ import { MenuStoreService } from '@store/common-store/menu-store.service';
 import { UserInfo, UserInfoService } from '@store/common-store/userInfo.service';
 import { fnFlatDataHasParentToTree } from '@utils/treeTableTools';
 
-/*
- * 退出登录
- * */
 @Injectable({
   providedIn: 'root'
 })
@@ -31,24 +28,24 @@ export class LoginInOutService {
   private menuService = inject(MenuStoreService);
   private windowServe = inject(WindowService);
 
-  // 通过用户Id来获取菜单数组
+  // Get the menu array by user ID
   getMenuByUserId(userId: number): Observable<Menu[]> {
     return this.loginService.getMenuByUserId(userId);
   }
 
   loginIn(token: string): Promise<void> {
     return new Promise(resolve => {
-      // 将 token 持久化缓存，请注意，如果没有缓存，则会在路由守卫中被拦截，不让路由跳转
-      // 这个路由守卫在src/app/core/services/common/guard/judgeLogin.guard.ts
+      // Cache the token persistently. Please note that if there is no cache, it will be intercepted in the route guard and the route will not be allowed to jump.
+      // This route is guarded at src/app/core/services/common/guard/judgeLogin.guard.ts
       this.windowServe.setSessionStorage(TokenKey, TokenPre + token);
-      // 解析token ，然后获取用户信息
+      // Parse the token and obtain user information
       const userInfo: UserInfo = this.userInfoService.parsToken(TokenPre + token);
-      // todo  这里是手动添加静态页面标签页操作中打开详情的按钮的权限，因为他们涉及到路由跳转，会走路由守卫，但是权限又没有通过后端管理，所以下面两行手动添加权限，实际操作中可以删除下面2行
+      // todo Here are the permissions for the button to open the details in the manual adding of static page tab operations, because they involve routing jumps and will be guarded, but the permissions are not managed through the backend, so the following two lines manually add permissions, and the actual operation You can delete the following 2 lines in
       userInfo.authCode.push(ActionCode.TabsDetail);
       userInfo.authCode.push(ActionCode.SearchTableDetail);
-      // 将用户信息缓存到全局service中
+      // Cache user information into the global service
       this.userInfoService.setUserInfo(userInfo);
-      // 通过用户id来获取这个用户所拥有的menu
+      // Get the menu owned by this user through the user ID
       this.getMenuByUserId(userInfo.userId)
         .pipe(
           finalize(() => {
@@ -63,18 +60,18 @@ export class LoginInOutService {
             return item.menuType === 'C';
           });
           const temp = fnFlatDataHasParentToTree(menus);
-          // 存储menu
+          // Store menu
           this.menuService.setMenuArrayStore(temp);
           resolve();
         });
     });
   }
 
-  // 清除Tab缓存,是与路由复用相关的东西
+  // Clearing the Tab cache is something related to route reuse.
   clearTabCash(): Promise<void> {
     return SimpleReuseStrategy.deleteAllRouteSnapshot(this.activatedRoute.snapshot).then(() => {
       return new Promise(resolve => {
-        // 清空tab
+        // Clear tab
         this.tabService.clearTabs();
         resolve();
       });

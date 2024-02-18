@@ -1,9 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
 
-/*
- * 顶部滚动pre服务
- * */
 @Injectable({
   providedIn: 'root'
 })
