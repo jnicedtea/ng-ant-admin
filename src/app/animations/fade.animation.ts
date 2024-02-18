@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 
-/** 渐隐渐显路由动画 */
+/** Fade in and out route animation */
 export const fadeRouteAnimation = trigger('fadeRouteAnimation', [
   transition('*<=>*', [
     // css styles at start of transition

@@ -1,7 +1,8 @@
 import { DOCUMENT, registerLocaleData } from '@angular/common';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import zh from '@angular/common/locales/zh';
-import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom } from '@angular/core';
+import en from '@angular/common/locales/en';
+import vi from '@angular/common/locales/vi';
+import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom, inject, LOCALE_ID } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, RouteReuseStrategy, TitleStrategy, withComponentInputBinding, withHashLocation, withInMemoryScrolling, withPreloading, withViewTransitions } from '@angular/router';
 
@@ -19,13 +20,14 @@ import { SubWindowWithService } from '@core/services/common/sub-window-with.serv
 import { ThemeSkinService } from '@core/services/common/theme-skin.service';
 import { StartupService } from '@core/startup/startup.service';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
-import { NZ_I18N, zh_CN } from 'ng-zorro-antd/i18n';
+import { NZ_I18N, en_US, vi_VN } from 'ng-zorro-antd/i18n';
 import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 
 const icons = [MenuFoldOutline, MenuUnfoldOutline, DashboardOutline, FormOutline];
 
-registerLocaleData(zh);
+registerLocaleData(en);
+registerLocaleData(vi);
 
 export function StartupServiceFactory(startupService: StartupService) {
   return () => startupService.load();
@@ -39,53 +41,45 @@ export function InitThemeServiceFactory(initThemeService: InitThemeService) {
   return async (): Promise<void> => await initThemeService.initTheme();
 }
 
-// 监听锁屏状态
 export function InitLockedStatusServiceFactory(subLockedStatusService: SubLockedStatusService) {
   return () => subLockedStatusService.initLockedStatus();
 }
 
-// 开启监听屏幕宽度
 export function SubWindowWithServiceFactory(subWindowWithService: SubWindowWithService) {
   return () => subWindowWithService.subWindowWidth();
 }
 
-const APPINIT_PROVIDES = [
-  // 项目启动
+const APP_INIT_PROVIDERS = [
   {
     provide: APP_INITIALIZER,
     useFactory: StartupServiceFactory,
     deps: [StartupService],
     multi: true
   },
-  // load阿里图标库cdn
   {
     provide: APP_INITIALIZER,
     useFactory: LoadAliIconCdnFactory,
     deps: [LoadAliIconCdnService],
     multi: true
   },
-  // 初始化锁屏服务
   {
     provide: APP_INITIALIZER,
     useFactory: InitLockedStatusServiceFactory,
     deps: [SubLockedStatusService],
     multi: true
   },
-  // 初始化主题
   {
     provide: APP_INITIALIZER,
     useFactory: InitThemeServiceFactory,
     deps: [InitThemeService],
     multi: true
   },
-  // 初始化监听屏幕宽度服务
   {
     provide: APP_INITIALIZER,
     useFactory: SubWindowWithServiceFactory,
     deps: [SubWindowWithService],
     multi: true
   },
-  // 初始化暗黑模式还是default模式的css
   {
     provide: APP_INITIALIZER,
     useFactory: (themeService: ThemeSkinService) => () => {
@@ -98,29 +92,40 @@ const APPINIT_PROVIDES = [
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    { provide: RouteReuseStrategy, useClass: SimpleReuseStrategy, deps: [DOCUMENT, ScrollService] }, // 路由复用
+    { provide: RouteReuseStrategy, useClass: SimpleReuseStrategy, deps: [DOCUMENT, ScrollService] },
     {
-      provide: TitleStrategy, // 相关资料：https://dev.to/brandontroberts/setting-page-titles-natively-with-the-angular-router-393j
-      useClass: CustomPageTitleResolverService // 自定义路由切换时，浏览器title的显示，在ng14以上支持。旧版本使用方式请看我的github v16tag以下版本代码
+      provide: TitleStrategy,
+      useClass: CustomPageTitleResolverService
     },
-    { provide: NZ_I18N, useValue: zh_CN }, // zorro国际化
-    { provide: NZ_ICONS, useValue: icons }, // zorro图标
+    {
+      provide: NZ_I18N,
+      useFactory: () => {
+        const localId = inject(LOCALE_ID);
+        switch (localId) {
+          case 'vi':
+            return vi_VN;
+          default:
+            return en_US;
+        }
+      }
+    },
+    { provide: NZ_ICONS, useValue: icons },
     provideRouter(
-      appRoutes, // 路由
-      withPreloading(SelectivePreloadingStrategyService), // 自定义模块预加载
+      appRoutes,
+      withPreloading(SelectivePreloadingStrategyService),
       withViewTransitions({
         skipInitialTransition: true
       }),
       withInMemoryScrolling({
         scrollPositionRestoration: 'top'
       }),
-      withHashLocation(), // 使用哈希路由
-      withComponentInputBinding() // 开启路由参数绑定到组件的输入属性,ng16新增特性
+      // withHashLocation(),
+      withComponentInputBinding()
     ),
     importProvidersFrom(NzDrawerModule, NzModalModule),
-    ...interceptors, // http拦截器
-    ...APPINIT_PROVIDES, // 项目启动之前，需要调用的一系列方法
-    provideAnimationsAsync(), // 开启延迟加载动画，ng17新增特性，如果想要项目启动时就加载动画，可以使用provideAnimations()
+    ...interceptors,
+    ...APP_INIT_PROVIDERS,
+    provideAnimationsAsync(), // Enable delayed loading animation, a new feature of ng17. If you want to load animation when the project starts, you can use provideAnimations()
     provideHttpClient(withInterceptorsFromDi())
   ]
 };

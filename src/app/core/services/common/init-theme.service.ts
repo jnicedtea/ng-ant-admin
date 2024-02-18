@@ -17,9 +17,6 @@ interface InitThemeOption {
   getMethodName: getThemeProp;
 }
 
-/*
- * Initialize theme
- * */
 @Injectable({
   providedIn: 'root'
 })
