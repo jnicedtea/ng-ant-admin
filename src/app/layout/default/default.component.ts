@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
 import { fadeRouteAnimation } from '@app/animations/fade.animation';
 import { SettingDrawerComponent, Theme } from '@app/layout/default/setting-drawer/setting-drawer.component';
 import { CollapsedNavWidth, IsFirstLogin, SideNavWidth } from '@config/constant';
-import { DriverService } from '@core/services/common/driver.service';
 import { WindowService } from '@core/services/common/window.service';
 import { Menu } from '@core/services/types';
 import { LayoutHeadRightMenuComponent } from '@shared/biz-components/layout-components/layout-head-right-menu/layout-head-right-menu.component';
@@ -68,7 +67,6 @@ export class DefaultComponent implements OnInit, AfterViewInit {
 
   destroyRef = inject(DestroyRef); // 用于销毁订阅
   windowService = inject(WindowService); // 用于获取window对象
-  driverService = inject(DriverService); // 用于引导用户
   themesService = inject(ThemeService); // 用于获取主题
   splitNavStoreService = inject(SplitNavStoreService); // 用于获取分割菜单的store
 
@@ -159,7 +157,6 @@ export class DefaultComponent implements OnInit, AfterViewInit {
       return;
     }
     this.windowService.setStorage(IsFirstLogin, 'false');
-    this.driverService.load();
   }
 
   ngOnInit(): void {
