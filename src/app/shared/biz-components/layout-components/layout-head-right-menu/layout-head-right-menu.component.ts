@@ -1,9 +1,10 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { LoginInOutService } from '@core/services/common/login-in-out.service';
 import { WindowService } from '@core/services/common/window.service';
+import { TranslocoService } from '@ngneat/transloco';
 import { AccountService, UserPsd } from '@services/system/account.service';
 import { ScreenLessHiddenDirective } from '@shared/directives/screen-less-hidden.directive';
 import { ToggleFullscreenDirective } from '@shared/directives/toggle-fullscreen.directive';
@@ -43,6 +44,7 @@ export class LayoutHeadRightMenuComponent implements OnInit {
   private message = inject(NzMessageService);
   private userInfoService = inject(UserInfoService);
   private accountService = inject(AccountService);
+  private translocoService = inject(TranslocoService);
 
   // 锁定屏幕
   lockScreen(): void {
@@ -97,6 +99,10 @@ export class LayoutHeadRightMenuComponent implements OnInit {
     this.windowServe.clearSessionStorage();
     this.loginOutService.loginOut().then();
     this.message.success('清除成功，请重新登录');
+  }
+
+  changeLanguage(lang: string) {
+    this.translocoService.setActiveLang(lang);
   }
 
   showMessage(): void {

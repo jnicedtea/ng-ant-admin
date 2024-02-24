@@ -5,6 +5,7 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 import { PreloaderService } from '@core/services/common/preloader.service';
+import { TranslocoService } from '@ngneat/transloco';
 import { LockScreenComponent } from '@shared/components/lock-screen/lock-screen.component';
 import { LockScreenStoreService } from '@store/common-store/lock-screen-store.service';
 import { SpinService } from '@store/common-store/spin.service';
@@ -42,6 +43,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   private lockScreenStoreService = inject(LockScreenStoreService);
   private spinService = inject(SpinService);
   private router = inject(Router);
+  private translocoService = inject(TranslocoService);
 
   loading$ = this.spinService.getCurrentGlobalSpinStore();
   lockedState$ = this.lockScreenStoreService.getLockScreenStore();
@@ -52,6 +54,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    console.log(this.translocoService.getActiveLang());
     this.router.events
       .pipe(
         filter((event: NzSafeAny) => event instanceof NavigationEnd),
