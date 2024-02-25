@@ -6,7 +6,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideRouter, RouteReuseStrategy, TitleStrategy, withComponentInputBinding, withInMemoryScrolling, withPreloading, withViewTransitions } from '@angular/router';
 
 import { DashboardOutline, FormOutline, MenuFoldOutline, MenuUnfoldOutline } from '@ant-design/icons-angular/icons';
-import { appRoutes } from '@app/app-routing';
+import { appRoutes } from '@app/app.routes';
 import interceptors from '@app/core/services/interceptors';
 import { TranslocoLocalLoader } from '@core/i18n/transloco-loader';
 import { CustomPageTitleResolverService } from '@core/services/common/custom-page-title-resolver.service';
