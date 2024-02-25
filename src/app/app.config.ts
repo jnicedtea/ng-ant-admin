@@ -121,7 +121,7 @@ export const appConfig: ApplicationConfig = {
     }),
     provideTranslocoLocale(),
     provideRouter(
-      appRoutes, // 路由
+      appRoutes,
       withPreloading(SelectivePreloadingStrategyService),
       withViewTransitions({
         skipInitialTransition: true
